@@ -7,3 +7,7 @@
 /DumpFlashSegs.pp
 /flash_utils.obj
 /flash_utils.pp
+/DumpFlashSegs.obj
+/msp430g_flashSegmentUtils.map
+/msp430g_flashSegmentUtils.out
+/msp430g_flashSegmentUtils_linkInfo.xml
