@@ -1,7 +1,7 @@
+#include <msp430.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <msp430.h>
 #include "flash_utils.h"
 
 // #########################
