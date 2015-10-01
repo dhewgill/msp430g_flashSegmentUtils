@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>msp430g_flashUtils</name>
+	<name>msp430g_flashSegmentUtils</name>
 	<comment></comment>
 	<projects>
 	</projects>
