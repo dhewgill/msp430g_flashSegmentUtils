@@ -69,7 +69,7 @@ void copy_segA_to_segB()
 	uint16_t *f_ptrB = (uint16_t *)SEGB_HEAD;
 	//uint16_t *f_ptrEnd = f_ptrA + SEG_LEN/2;
 
-	copy_seg_to_seg(f_ptrA, f_ptrB);
+	copy_seg_to_seg(f_ptrA, f_ptrB);	// Copy segmentA to segmentB.
 
 	/*FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
 	FCTL1 = FWKEY | ERASE;				// Set Erase bit
@@ -92,7 +92,7 @@ void erase_segB(void)
 {
 	uint16_t *f_ptrB = (uint16_t *)SEGB_HEAD;
 
-	erase_segment(f_ptrB, 1);
+	erase_segment(f_ptrB, 1);			// Erase segmentB and lock.
 
 	/*FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
 	FCTL1 = FWKEY | ERASE;				// Set Erase bit
