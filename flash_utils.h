@@ -22,7 +22,7 @@ uint16_t generate_crc(const uint16_t * const begin, const uint16_t * const end);
 uint8_t compare_crc_segA();
 void copy_seg_to_seg(uint16_t * pSrc, uint16_t * pDst);
 void copy_segA_to_segB();
-void erase_segment(uint16_t * pHead);
+void erase_segment(uint16_t * pHead, uint8_t lock);
 void erase_segB(void);
 
 

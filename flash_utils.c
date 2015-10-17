@@ -10,6 +10,7 @@
 #include "flash_utils.h"
 
 
+// Generic/base functions.
 uint16_t generate_crc(const uint16_t * const begin, const uint16_t * const end)
 {
     const uint16_t *p = begin + 1;                      // Begin at word after checksum
@@ -18,15 +19,22 @@ uint16_t generate_crc(const uint16_t * const begin, const uint16_t * const end)
     return ~chk + 1;									// Return 2's complement.
 }
 
-uint8_t compare_crc_segA()
+// Will not erase segment A.
+void erase_segment(uint16_t * pHead, uint8_t lock)
 {
-	uint16_t *f_ptr = (uint16_t *)SEGA_HEAD;
-	uint16_t crc = *f_ptr;	// Existing crc.
-	uint16_t calc = generate_crc((uint16_t *)SEGA_HEAD, (uint16_t *)(SEGA_HEAD + SEG_LEN/2));
-	__no_operation();
-	return (crc == calc);
-}
+	FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
+	FCTL1 = FWKEY | ERASE;				// Set Erase bit
+	FCTL3 = FWKEY;						// Clear LOCK  bit
 
+	*pHead = 0x00;						// Erase Segment
+
+	if (lock)
+	{
+		FCTL1 = FWKEY;					// Clear WRT bit
+		FCTL3 = FWKEY | LOCK;			// Set LOCK bit
+	}
+	__no_operation();
+}
 
 // Will not copy to segA!
 // Copies 16bits at a time.
@@ -35,11 +43,12 @@ void copy_seg_to_seg(uint16_t * pSrc, uint16_t * pDst)
 {
 	uint16_t * pSrcEnd = pSrc + SEG_LEN/2;
 
-	FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
+	/*FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
 	FCTL1 = FWKEY | ERASE;				// Set Erase bit
 	FCTL3 = FWKEY;						// Clear LOCK  bit
 
-	*pDst = 0x00;						// Erase destination segment
+	*pDst = 0x00;						// Erase destination segment */
+	erase_segment(pDst, 0);				// Erase destination segment and keep it unlocked.
 
 	FCTL1 = FWKEY | WRT;				// Set WRT bit for write operation
 
@@ -51,13 +60,18 @@ void copy_seg_to_seg(uint16_t * pSrc, uint16_t * pDst)
 	__no_operation();
 }
 
+
+// User access functions.
+
 void copy_segA_to_segB()
 {
 	uint16_t *f_ptrA = (uint16_t *)SEGA_HEAD;
 	uint16_t *f_ptrB = (uint16_t *)SEGB_HEAD;
-	uint16_t *f_ptrEnd = f_ptrA + SEG_LEN/2;
+	//uint16_t *f_ptrEnd = f_ptrA + SEG_LEN/2;
 
-	FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
+	copy_seg_to_seg(f_ptrA, f_ptrB);
+
+	/*FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
 	FCTL1 = FWKEY | ERASE;				// Set Erase bit
 	FCTL3 = FWKEY;						// Clear LOCK  bit
 
@@ -69,22 +83,7 @@ void copy_segA_to_segB()
 		*f_ptrB++ = *f_ptrA++;
 
 	FCTL1 = FWKEY;						// Clear WRT bit
-	FCTL3 = FWKEY | LOCK;				// Set LOCK bit
-	__no_operation();
-}
-
-
-// Will not erase segment A.
-void erase_segment(uint16_t * pHead)
-{
-	FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
-	FCTL1 = FWKEY | ERASE;				// Set Erase bit
-	FCTL3 = FWKEY;						// Clear LOCK  bit
-
-	*pHead = 0x00;						// Erase Segment
-
-	FCTL1 = FWKEY;						// Clear WRT bit
-	FCTL3 = FWKEY | LOCK;				// Set LOCK bit
+	FCTL3 = FWKEY | LOCK;				// Set LOCK bit */
 	__no_operation();
 }
 
@@ -93,13 +92,25 @@ void erase_segB(void)
 {
 	uint16_t *f_ptrB = (uint16_t *)SEGB_HEAD;
 
-	FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
+	erase_segment(f_ptrB, 1);
+
+	/*FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
 	FCTL1 = FWKEY | ERASE;				// Set Erase bit
 	FCTL3 = FWKEY;						// Clear LOCK  bit
 
 	*f_ptrB = 0x00;						// Erase SegmentB
 
 	FCTL1 = FWKEY;						// Clear WRT bit
-	FCTL3 = FWKEY | LOCK;				// Set LOCK bit
+	FCTL3 = FWKEY | LOCK;				// Set LOCK bit */
 	__no_operation();
 }
+
+uint8_t compare_crc_segA()
+{
+	uint16_t *f_ptr = (uint16_t *)SEGA_HEAD;
+	uint16_t crc = *f_ptr;	// Existing crc.
+	uint16_t calc = generate_crc((uint16_t *)SEGA_HEAD, (uint16_t *)(SEGA_HEAD + SEG_LEN/2));
+	__no_operation();
+	return (crc == calc);
+}
+
