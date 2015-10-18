@@ -42,12 +42,6 @@ void erase_segment(uint16_t * pHead, uint8_t lock)
 void copy_seg_to_seg(uint16_t * pSrc, uint16_t * pDst)
 {
 	uint16_t * pSrcEnd = pSrc + SEG_LEN/2;
-
-	/*FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
-	FCTL1 = FWKEY | ERASE;				// Set Erase bit
-	FCTL3 = FWKEY;						// Clear LOCK  bit
-
-	*pDst = 0x00;						// Erase destination segment */
 	erase_segment(pDst, 0);				// Erase destination segment and keep it unlocked.
 
 	FCTL1 = FWKEY | WRT;				// Set WRT bit for write operation
@@ -67,23 +61,8 @@ void copy_segA_to_segB()
 {
 	uint16_t *f_ptrA = (uint16_t *)SEGA_HEAD;
 	uint16_t *f_ptrB = (uint16_t *)SEGB_HEAD;
-	//uint16_t *f_ptrEnd = f_ptrA + SEG_LEN/2;
 
 	copy_seg_to_seg(f_ptrA, f_ptrB);	// Copy segmentA to segmentB.
-
-	/*FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
-	FCTL1 = FWKEY | ERASE;				// Set Erase bit
-	FCTL3 = FWKEY;						// Clear LOCK  bit
-
-	*f_ptrB = 0x00;						// Erase SegmentB
-
-	FCTL1 = FWKEY | WRT;				// Set WRT bit for write operation
-
-	while (f_ptrA < f_ptrEnd)
-		*f_ptrB++ = *f_ptrA++;
-
-	FCTL1 = FWKEY;						// Clear WRT bit
-	FCTL3 = FWKEY | LOCK;				// Set LOCK bit */
 	__no_operation();
 }
 
@@ -93,15 +72,6 @@ void erase_segB(void)
 	uint16_t *f_ptrB = (uint16_t *)SEGB_HEAD;
 
 	erase_segment(f_ptrB, 1);			// Erase segmentB and lock.
-
-	/*FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
-	FCTL1 = FWKEY | ERASE;				// Set Erase bit
-	FCTL3 = FWKEY;						// Clear LOCK  bit
-
-	*f_ptrB = 0x00;						// Erase SegmentB
-
-	FCTL1 = FWKEY;						// Clear WRT bit
-	FCTL3 = FWKEY | LOCK;				// Set LOCK bit */
 	__no_operation();
 }
 
