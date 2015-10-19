@@ -19,24 +19,29 @@ uint16_t generate_crc(const uint16_t * const begin, const uint16_t * const end)
     return ~chk + 1;									// Return 2's complement.
 }
 
-// Will not erase segment A.
+// Will erase segment A.
 void erase_segment(uint16_t * pHead, uint8_t lock)
 {
-	FCTL2 = FWKEY | FSSEL0 | FN1;		// MCLK/3 for Flash Timing Generator
-	FCTL1 = FWKEY | ERASE;				// Set Erase bit
-	FCTL3 = FWKEY;						// Clear LOCK  bit
+	FCTL2 = FWKEY | FSSEL0 | FN1;			// MCLK/3 for Flash Timing Generator
+	FCTL1 = FWKEY | ERASE;					// Set Erase bit
+	if (pHead == (uint16_t *)SEGA_HEAD)
+		FCTL3 = FWKEY | LOCKA;				// Clear LOCK and LOCKA  bits
+	else
+		FCTL3 = FWKEY;						// Clear LOCK  bit
 
-	*pHead = 0x00;						// Erase Segment
+	*pHead = 0x00;							// Erase Segment
 
 	if (lock)
 	{
-		FCTL1 = FWKEY;					// Clear WRT bit
-		FCTL3 = FWKEY | LOCK;			// Set LOCK bit
+		FCTL1 = FWKEY;						// Clear WRT bit
+		if (pHead == (uint16_t *)SEGA_HEAD)
+			FCTL3 = FWKEY | LOCK;			// Set LOCK bit
+		else
+			FCTL3 = FWKEY | LOCKA | LOCK;	// Set LOCKA, LOCK bit
 	}
 	__no_operation();
 }
 
-// Will not copy to segA!
 // Copies 16bits at a time.
 // Only copies whole segments.
 void copy_seg_to_seg(uint16_t * pSrc, uint16_t * pDst)
