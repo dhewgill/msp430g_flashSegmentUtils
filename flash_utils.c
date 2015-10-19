@@ -35,9 +35,9 @@ void erase_segment(uint16_t * pHead, uint8_t lock)
 	{
 		FCTL1 = FWKEY;						// Clear WRT bit
 		if (pHead == (uint16_t *)SEGA_HEAD)
-			FCTL3 = FWKEY | LOCK;			// Set LOCK bit
+			FCTL3 = FWKEY | LOCKA | LOCK;	// Set LOCK bit
 		else
-			FCTL3 = FWKEY | LOCKA | LOCK;	// Set LOCKA, LOCK bit
+			FCTL3 = FWKEY | LOCK;			// Set LOCKA, LOCK bit
 	}
 	__no_operation();
 }
@@ -62,7 +62,7 @@ void copy_seg_to_seg(uint16_t * pSrc, uint16_t * pDst)
 
 // User access functions.
 
-void copy_segA_to_segB()
+void copy_segA_to_segB(void)
 {
 	uint16_t *f_ptrA = (uint16_t *)SEGA_HEAD;
 	uint16_t *f_ptrB = (uint16_t *)SEGB_HEAD;
@@ -71,12 +71,54 @@ void copy_segA_to_segB()
 	__no_operation();
 }
 
+void copy_segA_to_segC(void)
+{
+	uint16_t *f_ptrA = (uint16_t *)SEGA_HEAD;
+	uint16_t *f_ptrC = (uint16_t *)SEGC_HEAD;
+
+	copy_seg_to_seg(f_ptrA, f_ptrC);	// Copy segmentA to segmentC.
+	__no_operation();
+}
+
+void copy_segA_to_segD(void)
+{
+	uint16_t *f_ptrA = (uint16_t *)SEGA_HEAD;
+	uint16_t *f_ptrD = (uint16_t *)SEGD_HEAD;
+
+	copy_seg_to_seg(f_ptrA, f_ptrD);	// Copy segmentA to segmentD.
+	__no_operation();
+}
+
 // It appears that segX values persist over device reprogramming!
+void erase_segA(void)
+{
+	uint16_t *f_ptrA = (uint16_t *)SEGA_HEAD;
+
+	erase_segment(f_ptrA, 1);			// Erase segmentA and lock.
+	__no_operation();
+}
+
 void erase_segB(void)
 {
 	uint16_t *f_ptrB = (uint16_t *)SEGB_HEAD;
 
 	erase_segment(f_ptrB, 1);			// Erase segmentB and lock.
+	__no_operation();
+}
+
+void erase_segC(void)
+{
+	uint16_t *f_ptrC = (uint16_t *)SEGC_HEAD;
+
+	erase_segment(f_ptrC, 1);			// Erase segmentC and lock.
+	__no_operation();
+}
+
+void erase_segD(void)
+{
+	uint16_t *f_ptrD = (uint16_t *)SEGD_HEAD;
+
+	erase_segment(f_ptrD, 1);			// Erase segmentD and lock.
 	__no_operation();
 }
 
