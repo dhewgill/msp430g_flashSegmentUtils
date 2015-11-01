@@ -13,10 +13,11 @@
 // Generic/base functions.
 uint16_t generate_crc(const uint16_t * const begin, const uint16_t * const end)
 {
-    const uint16_t *p = begin + 1;                      // Begin at word after checksum
-    uint16_t chk = 0;                                   // Init checksum
-    while(p < end) chk ^= *p++;                         // XOR all words in segment
-    return ~chk + 1;									// Return 2's complement.
+    const uint16_t *p = begin + 1;			// Begin at word after checksum
+    uint16_t chk = 0;						// Init checksum
+    while(p < end)
+    	chk ^= *p++;						// XOR all words in segment
+    return ~chk + 1;						// Return 2's complement.
 }
 
 // Will erase segment A.
