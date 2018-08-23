@@ -11,3 +11,5 @@
 /msp430g_flashSegmentUtils.map
 /msp430g_flashSegmentUtils.out
 /msp430g_flashSegmentUtils_linkInfo.xml
+/DumpFlashSegs.d
+/flash_utils.d
